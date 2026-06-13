@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { X, Trash2, RotateCcw, Play, Pause, Mic } from "lucide-react";
+import { X, Trash2, RotateCcw, Play, Pause, Mic, Download, Share2 } from "lucide-react";
 import { getRecording } from "@/utils/db";
 
 interface HistoryItem {
@@ -75,7 +75,6 @@ export default function SidebarRight({
     try {
       const blob = await getRecording(id);
       if (blob) {
-        // Revoke old URL if any
         if (playingUrl) {
           URL.revokeObjectURL(playingUrl);
         }
@@ -84,7 +83,6 @@ export default function SidebarRight({
         setPlayingUrl(url);
         setPlayingId(id);
 
-        // Play the audio
         setTimeout(() => {
           if (audioRef.current) {
             audioRef.current.src = url;
@@ -100,6 +98,53 @@ export default function SidebarRight({
     }
   };
 
+  const handleDownloadAudio = async (id: string, topic: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Stop click from selecting topic
+    try {
+      const blob = await getRecording(id);
+      if (blob) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        const cleanName = topic.slice(0, 20).replace(/[^a-zA-Z0-9]/g, "-");
+        a.download = `RompeHielo-${cleanName}.webm`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+    } catch (err) {
+      console.error("Failed to download recording:", err);
+    }
+  };
+
+  const handleShareAudio = async (id: string, topic: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Stop click from selecting topic
+    try {
+      const blob = await getRecording(id);
+      if (blob) {
+        const file = new File([blob], `RompeHielo-Práctica-${id}.webm`, { type: blob.type });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: `Mi práctica de Oratoria`,
+            text: `Escucha mi discurso sobre: "${topic}" en RompeHielo`,
+          });
+        } else if (navigator.share) {
+          await navigator.share({
+            title: `Mi práctica de Oratoria`,
+            text: `Practiqué el tema: "${topic}" en RompeHielo`,
+            url: window.location.href,
+          });
+        } else {
+          alert("Tu navegador no soporta la función de compartir directamente.");
+        }
+      }
+    } catch (err) {
+      console.error("Failed to share recording:", err);
+    }
+  };
+
   const onAudioEnded = () => {
     setPlayingId(null);
   };
@@ -109,7 +154,7 @@ export default function SidebarRight({
   };
 
   const onAudioPlay = () => {
-    // Safe sync if audio starts playing
+    // Sync active play state
   };
 
   return (
@@ -146,7 +191,7 @@ export default function SidebarRight({
               onClick={() => onSelectTopic(item.topic, item.id)}
               className="p-3.5 bg-surface-container/40 rounded-xl border border-outline-variant/20 text-on-surface text-sm font-medium shadow-sm hover:border-primary/40 hover:bg-primary/5 transition-all duration-300 cursor-pointer flex justify-between items-center group"
             >
-              <div className="flex flex-col text-left flex-grow mr-2">
+              <div className="flex flex-col text-left flex-grow mr-2 overflow-hidden">
                 <span className="line-clamp-2 leading-relaxed">
                   {item.topic}
                 </span>
@@ -160,23 +205,43 @@ export default function SidebarRight({
                 </span>
               </div>
 
-              <div className="flex items-center space-x-2 flex-shrink-0">
-                {/* Micro Audio Player */}
+              <div className="flex items-center space-x-1.5 flex-shrink-0">
+                {/* Audio controls */}
                 {item.hasRecording && (
-                  <button
-                    onClick={(e) => handlePlayAudio(item.id, e)}
-                    className="p-2 bg-primary/10 hover:bg-primary text-primary hover:text-background rounded-full transition-all duration-200 cursor-pointer flex items-center justify-center active:scale-90"
-                    title={playingId === item.id ? "Pausar discurso" : "Escuchar discurso grabado"}
-                  >
-                    {playingId === item.id ? (
-                      <Pause size={14} fill="currentColor" />
-                    ) : (
-                      <Play size={14} fill="currentColor" />
-                    )}
-                  </button>
+                  <div className="flex items-center space-x-1">
+                    {/* Play/Pause */}
+                    <button
+                      onClick={(e) => handlePlayAudio(item.id, e)}
+                      className="p-1.5 bg-primary/10 hover:bg-primary text-primary hover:text-background rounded-full transition-all duration-200 cursor-pointer flex items-center justify-center active:scale-90 border-none"
+                      title={playingId === item.id ? "Pausar" : "Escuchar"}
+                    >
+                      {playingId === item.id ? (
+                        <Pause size={12} fill="currentColor" />
+                      ) : (
+                        <Play size={12} fill="currentColor" />
+                      )}
+                    </button>
+
+                    {/* Download */}
+                    <button
+                      onClick={(e) => handleDownloadAudio(item.id, item.topic, e)}
+                      className="p-1.5 hover:bg-primary/10 text-on-surface-variant hover:text-primary rounded-full transition-all duration-200 cursor-pointer flex items-center justify-center active:scale-90 border-none"
+                      title="Descargar grabación"
+                    >
+                      <Download size={12} />
+                    </button>
+
+                    {/* Share */}
+                    <button
+                      onClick={(e) => handleShareAudio(item.id, item.topic, e)}
+                      className="p-1.5 hover:bg-primary/10 text-on-surface-variant hover:text-primary rounded-full transition-all duration-200 cursor-pointer flex items-center justify-center active:scale-90 border-none"
+                      title="Compartir grabación"
+                    >
+                      <Share2 size={12} />
+                    </button>
+                  </div>
                 )}
 
-                {/* Mic marker indicator */}
                 {item.hasRecording && !item.hasRecording && (
                   <Mic size={14} className="text-primary/60" />
                 )}
@@ -190,12 +255,10 @@ export default function SidebarRight({
         )}
       </div>
 
-      {/* Hidden Global Audio Element for Sidebar Playback */}
       <audio
         ref={audioRef}
         onEnded={onAudioEnded}
         onPause={onAudioPause}
-        onPlay={onAudioPlay}
         className="hidden"
       />
 

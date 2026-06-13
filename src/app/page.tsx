@@ -10,7 +10,6 @@ import VoiceRecorder from "@/components/VoiceRecorder";
 import WelcomeModal from "@/components/WelcomeModal";
 import PrivacyModal from "@/components/PrivacyModal";
 import { clearAllRecordings } from "@/utils/db";
-import { Star, Youtube } from "lucide-react";
 
 interface HistoryItem {
   id: string;
@@ -306,7 +305,7 @@ export default function Home() {
             Privacidad
           </span>
           
-          {/* YouTube Button - Redirects to GitHub */}
+          {/* YouTube Button - Inline SVG to bypass outdated lucide package limitations */}
           <a
             href="https://github.com/CoralGamer/RompeHielo_APP"
             target="_blank"
@@ -314,11 +313,13 @@ export default function Home() {
             className="flex items-center space-x-1 hover:text-red-600 transition-colors cursor-pointer focus:outline-none focus:ring-1 focus:ring-primary/45 rounded px-1 text-on-surface-variant font-bold normal-case"
             aria-label="Ver canal de YouTube (redirecciona al repositorio de GitHub)"
           >
-            <Youtube size={14} className="text-red-500 fill-none" aria-hidden="true" />
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" className="text-red-500" stroke="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M23.498 6.163a3.003 3.003 0 0 0-2.11-2.11C19.517 3.545 12 3.545 12 3.545s-7.517 0-9.388.508a3.003 3.003 0 0 0-2.11 2.11C0 8.033 0 12 0 12s0 3.967.502 5.837a3.003 3.003 0 0 0 2.11 2.11c1.871.508 9.388.508 9.388.508s7.517 0 9.388-.508a3.003 3.003 0 0 0 2.11-2.11C24 15.967 24 12 24 12s0-3.967-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+            </svg>
             <span>YouTube</span>
           </a>
 
-          {/* GitHub Star Button - Redirects to stargazers */}
+          {/* GitHub Star Button - Inline SVG to bypass outdated lucide package limitations */}
           <a
             href="https://github.com/CoralGamer/RompeHielo_APP/stargazers"
             target="_blank"
@@ -326,7 +327,9 @@ export default function Home() {
             className="flex items-center space-x-1 hover:text-primary transition-colors cursor-pointer focus:outline-none focus:ring-1 focus:ring-primary/45 rounded px-1 text-on-surface-variant font-bold normal-case"
             aria-label="Dar una estrella al repositorio en GitHub"
           >
-            <Star size={14} className="text-amber-500 fill-amber-500" aria-hidden="true" />
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" className="text-amber-500" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+            </svg>
             <span>Dar Estrella</span>
           </a>
 

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { Mic, Square, Play, Pause, Trash2, AlertCircle, Sparkles } from "lucide-react";
+import { Mic, Square, Play, Pause, Trash2, AlertCircle, Sparkles, Download, Share2 } from "lucide-react";
 import { saveRecording, getRecording, deleteRecording as deleteRecordingFromDB } from "@/utils/db";
 
 interface VoiceRecorderProps {
@@ -242,6 +242,33 @@ export default function VoiceRecorder({
     }
   };
 
+  const handleShare = async () => {
+    if (!audioUrl || !activeHistoryId) return;
+    try {
+      const response = await fetch(audioUrl);
+      const blob = await response.blob();
+      const file = new File([blob], `RompeHielo-Discurso-${activeHistoryId}.webm`, { type: blob.type });
+
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: "Mi práctica en RompeHielo",
+          text: "¡Escucha mi práctica de oratoria improvisada grabada 100% en local!",
+        });
+      } else if (navigator.share) {
+        await navigator.share({
+          title: "Práctica en RompeHielo",
+          text: "Practicando oratoria y rompiendo el hielo.",
+          url: window.location.href,
+        });
+      } else {
+        alert("Tu navegador no soporta la función de compartir directamente.");
+      }
+    } catch (err) {
+      console.error("Error al compartir:", err);
+    }
+  };
+
   const formatDuration = (secs: number) => {
     const m = Math.floor(secs / 60).toString().padStart(2, '0');
     const s = (secs % 60).toString().padStart(2, '0');
@@ -274,7 +301,7 @@ export default function VoiceRecorder({
       {isRecording && (
         <div className="glass-panel w-full p-3 rounded-2xl flex flex-col items-center border border-red-500/30 bg-red-500/5 shadow-md">
           <div className="flex items-center justify-between w-full mb-2 px-1">
-            <span className="text-[10px] uppercase font-bold text-red-500 tracking-widest flex items-center space-x-1 animate-pulse">
+            <span className="text-[10px] uppercase font-bold text-red-500 tracking-widest flex items-center space-x-1.5 animate-pulse">
               <span className="w-2 h-2 bg-red-500 rounded-full inline-block" />
               <span>Grabando</span>
             </span>
@@ -303,29 +330,55 @@ export default function VoiceRecorder({
       {/* Visual State: COMPLETED RECORDING (PLAYBACK) */}
       {audioUrl && (
         <div className="glass-panel w-full p-3 rounded-xl flex items-center justify-between border border-outline-variant/30 shadow-md">
-          <div className="flex items-center space-x-3.5">
+          <div className="flex items-center space-x-3 flex-grow mr-2">
             <button
               onClick={togglePlayback}
-              className="p-2.5 bg-primary text-background rounded-full hover:bg-primary-hover transition-colors cursor-pointer active:scale-90 border-none flex items-center justify-center"
+              className="p-2.5 bg-primary text-background rounded-full hover:bg-primary-hover transition-colors cursor-pointer active:scale-90 border-none flex items-center justify-center flex-shrink-0"
               title={isPlaying ? "Pausar audio" : "Reproducir audio"}
             >
               {isPlaying ? <Pause size={12} fill="currentColor" /> : <Play size={12} fill="currentColor" />}
             </button>
-            <div className="text-left">
-              <p className="text-[11px] font-bold text-foreground leading-tight">Tu Grabación Guardada</p>
-              <p className="text-[9px] text-on-surface-variant/75 mt-0.5 font-semibold uppercase tracking-wider leading-none">
-                Almacenado localmente en este dispositivo
+            <div className="text-left overflow-hidden">
+              <p className="text-[11px] font-bold text-foreground leading-tight truncate">Tu Grabación</p>
+              <p className="text-[9px] text-on-surface-variant/75 mt-0.5 font-semibold uppercase tracking-wider leading-none truncate">
+                Discurso guardado localmente
               </p>
             </div>
           </div>
 
-          <button
-            onClick={deleteRecording}
-            className="p-1.5 text-on-surface-variant hover:text-error transition-colors rounded-lg cursor-pointer bg-transparent border-none"
-            title="Eliminar grabación"
-          >
-            <Trash2 size={14} />
-          </button>
+          {/* Action Row: Download, Share, Delete */}
+          <div className="flex items-center space-x-1 flex-shrink-0">
+            {/* Download Link */}
+            <a
+              href={audioUrl}
+              download={`RompeHielo-Discurso-${activeHistoryId}.webm`}
+              className="p-1.5 text-on-surface-variant hover:text-primary transition-colors rounded-lg cursor-pointer flex items-center justify-center bg-transparent border-none"
+              title="Descargar audio"
+              aria-label="Descargar audio"
+            >
+              <Download size={14} />
+            </a>
+
+            {/* Share Button */}
+            <button
+              onClick={handleShare}
+              className="p-1.5 text-on-surface-variant hover:text-primary transition-colors rounded-lg cursor-pointer flex items-center justify-center bg-transparent border-none"
+              title="Compartir audio"
+              aria-label="Compartir audio"
+            >
+              <Share2 size={14} />
+            </button>
+
+            {/* Delete Button */}
+            <button
+              onClick={deleteRecording}
+              className="p-1.5 text-on-surface-variant hover:text-error transition-colors rounded-lg cursor-pointer bg-transparent border-none"
+              title="Eliminar grabación"
+              aria-label="Eliminar grabación"
+            >
+              <Trash2 size={14} />
+            </button>
+          </div>
 
           <audio
             ref={audioRef}
