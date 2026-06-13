@@ -25,25 +25,22 @@ export default function Timer({ onTimerComplete }: TimerProps) {
   
   const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const { playChime, playTick } = useAudio();
+  const { playTick } = useAudio();
 
   // Handle countdown interval
   useEffect(() => {
     if (isRunning) {
       timerIntervalRef.current = setInterval(() => {
         setTimeLeft((prev) => {
-          if (prev <= 1) {
-            clearInterval(timerIntervalRef.current!);
-            setIsRunning(false);
-            playChime();
-            if (onTimerComplete) onTimerComplete();
+          const nextTime = prev - 1;
+          if (nextTime <= 0) {
             return 0;
           }
-          // Tick sound during final 5 seconds
-          if (prev <= 6) {
+          // Tick sound during final 5 seconds (5, 4, 3, 2, 1)
+          if (nextTime <= 5) {
             playTick();
           }
-          return prev - 1;
+          return nextTime;
         });
       }, 1000);
     } else {
@@ -57,7 +54,20 @@ export default function Timer({ onTimerComplete }: TimerProps) {
         clearInterval(timerIntervalRef.current);
       }
     };
-  }, [isRunning, playChime, playTick, onTimerComplete]);
+  }, [isRunning, playTick]);
+
+  // Handle completion side effects when timeLeft reaches 0
+  useEffect(() => {
+    if (timeLeft === 0 && isRunning) {
+      setIsRunning(false);
+      if (timerIntervalRef.current) {
+        clearInterval(timerIntervalRef.current);
+      }
+      if (onTimerComplete) {
+        onTimerComplete();
+      }
+    }
+  }, [timeLeft, isRunning, onTimerComplete]);
 
   // Click outside to close the time picker
   useEffect(() => {
@@ -109,7 +119,7 @@ export default function Timer({ onTimerComplete }: TimerProps) {
 
   return (
     <div ref={containerRef} className="relative mt-2 select-none">
-      {/* Main Timer Pill - Height optimized */}
+      {/* Main Timer Pill */}
       <div 
         className={`glass-panel px-6 py-2 rounded-full flex items-center space-x-3.5 transition-all duration-300 shadow-md ${
           isLowTime 
@@ -165,11 +175,7 @@ export default function Timer({ onTimerComplete }: TimerProps) {
               <button
                 key={preset.value}
                 onClick={() => selectPreset(preset.value)}
-                className={`py-1.5 px-2.5 text-[10px] font-semibold rounded-lg text-center border transition-all cursor-pointer flex items-center justify-between bg-transparent ${
-                  initialTime === preset.value
-                    ? "bg-primary/10 border-primary text-primary"
-                    : "bg-surface-container/20 border-outline-variant/20 hover:border-primary/40 text-foreground"
-                }`}
+                className="py-1.5 px-2.5 text-[10px] font-semibold rounded-lg text-center border transition-all cursor-pointer flex items-center justify-between bg-transparent"
               >
                 <span>{preset.label}</span>
                 {initialTime === preset.value && <Check size={10} />}

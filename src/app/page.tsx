@@ -12,6 +12,7 @@ import PrivacyModal from "@/components/PrivacyModal";
 import ConfirmModal from "@/components/ConfirmModal";
 import { clearAllRecordings, deleteRecording } from "@/utils/db";
 import { Star } from "lucide-react";
+import { useAudio } from "@/hooks/useAudio";
 
 interface HistoryItem {
   id: string;
@@ -21,6 +22,7 @@ interface HistoryItem {
 }
 
 export default function Home() {
+  const { playChime } = useAudio();
   const [isMounted, setIsMounted] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark">("light");
   
@@ -35,6 +37,7 @@ export default function Home() {
   const [activeHistoryId, setActiveHistoryId] = useState<string | null>(null);
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [starCount, setStarCount] = useState<number | null>(null);
+  const [forceStopRecordTrigger, setForceStopRecordTrigger] = useState(0);
 
   const timerSectionRef = useRef<HTMLDivElement>(null);
 
@@ -197,6 +200,15 @@ export default function Home() {
     );
   };
 
+  const handleTimerComplete = () => {
+    // 1. Force the recorder to stop recording immediately to ensure mic track is closed before chime plays
+    setForceStopRecordTrigger(Date.now());
+    // 2. Play the selection chime after a short delay (250ms) to ensure mic isn't recording anymore
+    setTimeout(() => {
+      playChime();
+    }, 250);
+  };
+
   const handleScrollToTimer = () => {
     timerSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
   };
@@ -297,11 +309,12 @@ export default function Home() {
           activeHistoryId={activeHistoryId}
           onRecordingSaved={handleRecordingSaved}
           onRecordingDeleted={handleRecordingDeleted}
+          forceStopRecordTrigger={forceStopRecordTrigger}
         />
 
         {/* Organic Timer Section */}
         <div ref={timerSectionRef} className="mt-2 transition-transform duration-300">
-          <Timer />
+          <Timer onTimerComplete={handleTimerComplete} />
         </div>
       </main>
 

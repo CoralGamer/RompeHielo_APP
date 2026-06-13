@@ -105,11 +105,12 @@ export default function SidebarRight({
     try {
       const blob = await getRecording(id);
       if (blob) {
-        const url = URL.createObjectURL(blob);
+        const mp3Blob = new Blob([blob], { type: "audio/mp3" });
+        const url = URL.createObjectURL(mp3Blob);
         const a = document.createElement("a");
         a.href = url;
         const cleanName = topic.slice(0, 20).replace(/[^a-zA-Z0-9]/g, "-");
-        a.download = `RompeHielo-${cleanName}.webm`;
+        a.download = `RompeHielo-${cleanName}.mp3`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -125,7 +126,7 @@ export default function SidebarRight({
     try {
       const blob = await getRecording(id);
       if (blob) {
-        const file = new File([blob], `RompeHielo-Práctica-${id}.webm`, { type: blob.type });
+        const file = new File([blob], `RompeHielo-Práctica-${id}.mp3`, { type: "audio/mp3" });
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           await navigator.share({
             files: [file],

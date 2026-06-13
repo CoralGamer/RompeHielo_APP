@@ -8,12 +8,14 @@ interface VoiceRecorderProps {
   activeHistoryId: string | null;
   onRecordingSaved: (id: string) => void;
   onRecordingDeleted: (id: string) => void;
+  forceStopRecordTrigger?: number; // New trigger to stop recording from parent
 }
 
 export default function VoiceRecorder({
   activeHistoryId,
   onRecordingSaved,
   onRecordingDeleted,
+  forceStopRecordTrigger,
 }: VoiceRecorderProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
@@ -55,6 +57,13 @@ export default function VoiceRecorder({
       isCurrent = false;
     };
   }, [activeHistoryId]);
+
+  // Listen to parent force stop triggers
+  useEffect(() => {
+    if (forceStopRecordTrigger && forceStopRecordTrigger > 0 && isRecording) {
+      stopRecording();
+    }
+  }, [forceStopRecordTrigger]);
 
   // Update recording timer
   useEffect(() => {
@@ -157,9 +166,16 @@ export default function VoiceRecorder({
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
 
-      const options = { mimeType: "audio/webm" };
-      let recorder;
+      const options: MediaRecorderOptions = {};
+      if (typeof MediaRecorder.isTypeSupported === "function") {
+        if (MediaRecorder.isTypeSupported("audio/mp3")) {
+          options.mimeType = "audio/mp3";
+        } else if (MediaRecorder.isTypeSupported("audio/webm")) {
+          options.mimeType = "audio/webm";
+        }
+      }
       
+      let recorder;
       try {
         recorder = new MediaRecorder(stream, options);
       } catch (e) {
@@ -175,7 +191,8 @@ export default function VoiceRecorder({
       };
 
       recorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+        const mimeType = mediaRecorderRef.current?.mimeType || "audio/mp3";
+        const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
         
         try {
           await saveRecording(activeHistoryId, audioBlob);
@@ -247,7 +264,7 @@ export default function VoiceRecorder({
     try {
       const response = await fetch(audioUrl);
       const blob = await response.blob();
-      const file = new File([blob], `RompeHielo-Discurso-${activeHistoryId}.webm`, { type: blob.type });
+      const file = new File([blob], `RompeHielo-Discurso-${activeHistoryId}.mp3`, { type: "audio/mp3" });
 
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({
@@ -348,10 +365,9 @@ export default function VoiceRecorder({
 
           {/* Action Row: Download, Share, Delete */}
           <div className="flex items-center space-x-1 flex-shrink-0">
-            {/* Download Link */}
             <a
               href={audioUrl}
-              download={`RompeHielo-Discurso-${activeHistoryId}.webm`}
+              download={`RompeHielo-Discurso-${activeHistoryId}.mp3`}
               className="p-1.5 text-on-surface-variant hover:text-primary transition-colors rounded-lg cursor-pointer flex items-center justify-center bg-transparent border-none"
               title="Descargar audio"
               aria-label="Descargar audio"
@@ -359,7 +375,6 @@ export default function VoiceRecorder({
               <Download size={14} />
             </a>
 
-            {/* Share Button */}
             <button
               onClick={handleShare}
               className="p-1.5 text-on-surface-variant hover:text-primary transition-colors rounded-lg cursor-pointer flex items-center justify-center bg-transparent border-none"
@@ -369,7 +384,6 @@ export default function VoiceRecorder({
               <Share2 size={14} />
             </button>
 
-            {/* Delete Button */}
             <button
               onClick={deleteRecording}
               className="p-1.5 text-on-surface-variant hover:text-error transition-colors rounded-lg cursor-pointer bg-transparent border-none"
