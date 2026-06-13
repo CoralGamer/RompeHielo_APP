@@ -10,6 +10,7 @@ import VoiceRecorder from "@/components/VoiceRecorder";
 import WelcomeModal from "@/components/WelcomeModal";
 import PrivacyModal from "@/components/PrivacyModal";
 import { clearAllRecordings } from "@/utils/db";
+import { Star, Youtube } from "lucide-react";
 
 interface HistoryItem {
   id: string;
@@ -242,7 +243,7 @@ export default function Home() {
         onSelectTopic={handleSelectFromHistory}
       />
 
-      {/* Main Canvas / Hero Area - Height locked, layout centered */}
+      {/* Main Canvas / Hero Area */}
       <main className="relative z-10 flex-1 w-full flex flex-col items-center justify-center px-4 py-16 text-center max-w-4xl mx-auto overflow-hidden">
         
         {/* Topic Selector */}
@@ -278,10 +279,10 @@ export default function Home() {
         onClose={() => setPrivacyModalOpen(false)}
       />
 
-      {/* Footer - Always visible at bottom, no scrolls */}
+      {/* Footer */}
       <footer className="relative z-10 w-full bg-transparent px-6 md:px-16 py-3 flex flex-col md:flex-row justify-between items-center text-[10px] md:text-xs text-on-surface-variant/60 font-semibold uppercase tracking-wider gap-1.5 select-none border-t border-outline-variant/10">
         <div>© 2026 ROMPEHIELO ENGINE. ENFÓCATE.</div>
-        <div className="flex space-x-6" role="navigation" aria-label="Enlaces del Pie de Página">
+        <div className="flex space-x-6 items-center" role="navigation" aria-label="Enlaces del Pie de Página">
           <span 
             role="button"
             tabIndex={0}
@@ -304,8 +305,33 @@ export default function Home() {
           >
             Privacidad
           </span>
+          
+          {/* YouTube Button - Redirects to GitHub */}
           <a
-            href="https://github.com"
+            href="https://github.com/CoralGamer/RompeHielo_APP"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center space-x-1 hover:text-red-600 transition-colors cursor-pointer focus:outline-none focus:ring-1 focus:ring-primary/45 rounded px-1 text-on-surface-variant font-bold normal-case"
+            aria-label="Ver canal de YouTube (redirecciona al repositorio de GitHub)"
+          >
+            <Youtube size={14} className="text-red-500 fill-none" aria-hidden="true" />
+            <span>YouTube</span>
+          </a>
+
+          {/* GitHub Star Button - Redirects to stargazers */}
+          <a
+            href="https://github.com/CoralGamer/RompeHielo_APP/stargazers"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center space-x-1 hover:text-primary transition-colors cursor-pointer focus:outline-none focus:ring-1 focus:ring-primary/45 rounded px-1 text-on-surface-variant font-bold normal-case"
+            aria-label="Dar una estrella al repositorio en GitHub"
+          >
+            <Star size={14} className="text-amber-500 fill-amber-500" aria-hidden="true" />
+            <span>Dar Estrella</span>
+          </a>
+
+          <a
+            href="https://github.com/CoralGamer/RompeHielo_APP"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-primary transition-colors cursor-pointer focus:outline-none focus:ring-1 focus:ring-primary/45 rounded px-1"
