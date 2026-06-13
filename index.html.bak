@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>THE VOID - Topic Generator</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-container": "#4e1c00",
+                        "on-surface": "#1c1c18",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-primary": "#ffb4a5",
+                        "on-secondary-container": "#6f5400",
+                        "background": "#fcf9f3",
+                        "on-tertiary-fixed-variant": "#7a3000",
+                        "on-secondary-fixed": "#251a00",
+                        "secondary-container": "#fec72c",
+                        "on-primary-fixed": "#3e0500",
+                        "surface": "#fcf9f3",
+                        "primary": "#9f402d",
+                        "on-surface-variant": "#56423e",
+                        "on-primary-container": "#5a0d02",
+                        "secondary-fixed": "#ffdf98",
+                        "primary-fixed-dim": "#ffb4a5",
+                        "secondary": "#775a00",
+                        "surface-tint": "#9f402d",
+                        "secondary-fixed-dim": "#f5bf22",
+                        "on-tertiary-fixed": "#351000",
+                        "on-primary-fixed-variant": "#802918",
+                        "surface-container-low": "#f6f3ed",
+                        "primary-fixed": "#ffdad3",
+                        "outline-variant": "#ddc0ba",
+                        "error-container": "#ffdad6",
+                        "inverse-surface": "#31312d",
+                        "inverse-on-surface": "#f3f0ea",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#ed6d21",
+                        "on-error": "#ffffff",
+                        "outline": "#89726d",
+                        "on-secondary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "surface-container-high": "#ebe8e2",
+                        "surface-container-highest": "#e5e2dc",
+                        "surface-container": "#f0eee8",
+                        "primary-container": "#e2725b",
+                        "tertiary-fixed-dim": "#ffb693",
+                        "on-background": "#1c1c18",
+                        "error": "#ba1a1a",
+                        "on-primary": "#ffffff",
+                        "surface-dim": "#dcdad4",
+                        "surface-bright": "#fcf9f3",
+                        "on-secondary-fixed-variant": "#5a4300",
+                        "tertiary": "#a04100",
+                        "surface-variant": "#e5e2dc",
+                        "tertiary-fixed": "#ffdbcc"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "xs": "4px",
+                        "sm": "12px",
+                        "gutter": "24px",
+                        "base": "8px",
+                        "lg": "48px",
+                        "margin-mobile": "20px",
+                        "margin-desktop": "64px",
+                        "xl": "80px",
+                        "md": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Montserrat"],
+                        "body-md": ["Montserrat"],
+                        "display-lg": ["Montserrat"],
+                        "headline-lg-mobile": ["Montserrat"],
+                        "body-lg": ["Montserrat"],
+                        "display-xl": ["Montserrat"],
+                        "label-md": ["Montserrat"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "display-xl": ["64px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #fcf9f3;
+            color: #1c1c18;
+            overflow: hidden;
+        }
+        .glass-panel {
+            background: rgba(252, 249, 243, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(221, 192, 186, 0.5);
+            box-shadow: 0 8px 32px rgba(86, 66, 62, 0.05);
+        }
+        .input-focus-border {
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.3s ease;
+        }
+        .input-focus-border:focus {
+            border-bottom-color: #9f402d;
+            outline: none;
+        }
+        .roulette-shimmer {
+            animation: shimmer 0.1s infinite;
+        }
+        @keyframes shimmer {
+            0% { opacity: 0.8; transform: translateY(-2px); }
+            50% { opacity: 1; transform: translateY(2px); }
+            100% { opacity: 0.8; transform: translateY(-2px); }
+        }
+        .sidebar-open {
+            transform: translateX(0);
+        }
+        .sidebar-closed-left {
+            transform: translateX(-100%);
+        }
+        .sidebar-closed-right {
+            transform: translateX(100%);
+        }
+        aside {
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen relative flex items-center justify-center font-body-md text-on-surface">
+<!-- Background -->
+<div class="fixed inset-0 w-full h-full z-0">
+<img alt="Landscape Background" class="w-full h-full object-cover object-bottom" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDoy0CP_DiUv3m04WOqSbnMLvTilAzib5RIm_OUMoCDYRfnTNr3FP_0l1L5edrGZnu1TAaWTzcczxGupe6zhe-ylW6aZRmKnkyDDjP6Mj6qbioNuYiiiWzpohxOMxvVlCXsYFMywa-iKsXZ24raSSkQ3zKrP4vXUyYakscr0_27PqFI7jX711qIu7IHKMQTNSSkuaSoFffk9v4L_I9IykFHe-vdRNFvom5rz6teALiVslSyXc4wjwNh"/>
+<div class="absolute inset-0 bg-surface/50 backdrop-blur-[1px]"></div>
+</div>
+<!-- Top Navigation Area -->
+<nav class="fixed top-0 w-full bg-transparent z-40 backdrop-blur-md border-b border-outline-variant/30 flex justify-between items-center px-gutter py-sm mx-auto">
+<div class="font-display-lg text-display-lg tracking-tighter text-primary">THE VOID</div>
+<div class="hidden md:flex space-x-lg items-center">
+<span class="text-on-surface-variant font-label-md text-label-md uppercase hover:text-primary transition-colors duration-300 cursor-pointer" id="nav-history">History</span>
+<span class="text-on-surface-variant font-label-md text-label-md uppercase hover:text-primary transition-colors duration-300 cursor-pointer">Categories</span>
+<span class="text-on-surface-variant font-label-md text-label-md uppercase hover:text-primary transition-colors duration-300 cursor-pointer">Timer</span>
+</div>
+<div class="flex space-x-md">
+<span class="material-symbols-outlined text-primary cursor-pointer active:scale-95 transition-transform hover:text-primary-container duration-300">settings</span>
+<span class="material-symbols-outlined text-primary cursor-pointer active:scale-95 transition-transform hover:text-primary-container duration-300">account_circle</span>
+</div>
+</nav>
+<!-- Sidebar Toggle Button (Left) -->
+<button class="fixed top-24 left-gutter z-50 glass-panel p-base rounded-full text-primary hover:text-primary-container transition-colors" id="toggle-sidebar">
+<span class="material-symbols-outlined">menu_open</span>
+</button>
+<!-- Input Sidebar Panel (Left) -->
+<aside class="sidebar-closed-left fixed left-0 top-0 h-full w-80 md:w-96 glass-panel z-40 flex flex-col p-gutter pt-32 shadow-2xl" id="sidebar">
+<h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-md">Topic Pool</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-sm">Enter topics separated by new lines.</p>
+<textarea class="w-full flex-grow bg-surface-container/50 text-on-surface p-md rounded-xl resize-none input-focus-border font-body-md text-body-md border border-outline-variant/50 focus:border-primary focus:ring-0" id="topic-input" placeholder="Artificial Intelligence
+Quantum Computing
+Cybernetics..."></textarea>
+<div class="mt-md flex justify-between items-center">
+<button class="flex items-center space-x-2 text-on-surface-variant hover:text-primary transition-colors font-label-md text-label-md uppercase">
+<span class="material-symbols-outlined text-[18px]">upload_file</span>
+<span>Upload .txt</span>
+</button>
+<span class="font-label-md text-label-md text-on-surface-variant uppercase"><span id="topic-count">0</span> Topics</span>
+</div>
+</aside>
+<!-- History Sidebar Panel (Right) -->
+<aside class="sidebar-closed-right fixed right-0 top-0 h-full w-80 md:w-96 glass-panel z-40 flex flex-col p-gutter pt-32 shadow-2xl" id="history-sidebar">
+<div class="flex justify-between items-center mb-md">
+<h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary">History</h2>
+<button class="text-on-surface-variant hover:text-primary transition-colors" id="close-history">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="flex-grow overflow-y-auto space-y-sm" id="history-list">
+<p class="text-on-surface-variant font-body-md text-body-md italic text-center mt-lg">No topics generated yet.</p>
+</div>
+</aside>
+<!-- Main Canvas / Hero Area -->
+<main class="relative z-10 flex flex-col items-center justify-center w-full px-gutter text-center mt-12">
+<!-- The Void Output Display -->
+<div class="min-h-[250px] md:min-h-[350px] flex items-center justify-center mb-xl w-full">
+<h1 class="font-display-xl text-display-lg md:text-display-xl text-on-tertiary-container leading-tight opacity-70 transition-all duration-300 drop-shadow-sm" id="topic-display">
+                AWAITING INPUT
+            </h1>
+</div>
+<!-- Primary Generator Action -->
+<button class="bg-primary hover:bg-primary-container text-on-primary font-headline-lg text-headline-lg-mobile md:text-headline-lg py-sm px-lg rounded-full flex items-center space-x-sm group mb-xl cursor-pointer active:scale-95 transition-all shadow-md hover:shadow-lg" id="generate-btn">
+<span class="material-symbols-outlined group-hover:animate-spin">bolt</span>
+<span>¡Sortear Tema!</span>
+</button>
+<!-- Organic Timer -->
+<div class="glass-panel px-lg py-sm rounded-full flex items-center space-x-md">
+<div class="font-headline-lg text-headline-lg tracking-wider text-primary" id="timer-display">05:00</div>
+<div class="flex space-x-base border-l border-outline-variant pl-md">
+<button class="text-on-surface-variant hover:text-primary transition-colors" id="timer-start">
+<span class="material-symbols-outlined">play_arrow</span>
+</button>
+<button class="text-on-surface-variant hover:text-error transition-colors" id="timer-reset">
+<span class="material-symbols-outlined">restart_alt</span>
+</button>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="fixed bottom-0 w-full bg-transparent px-gutter py-sm flex justify-between items-center z-30 opacity-60 hover:opacity-100 transition-opacity">
+<div class="font-label-md text-label-md text-on-surface-variant uppercase">© 2024 VOID ENGINE. STAY FOCUSED.</div>
+<div class="flex space-x-md font-label-md text-label-md text-on-surface-variant uppercase">
+<span class="hover:text-primary transition-colors cursor-pointer">Privacy</span>
+<span class="hover:text-primary transition-colors cursor-pointer">System Status</span>
+<span class="hover:text-primary transition-colors cursor-pointer">Github</span>
+</div>
+</footer>
+<script>
+        // Sidebar Logic (Left)
+        const sidebar = document.getElementById('sidebar');
+        const toggleBtn = document.getElementById('toggle-sidebar');
+        const icon = toggleBtn.querySelector('.material-symbols-outlined');
+
+        toggleBtn.addEventListener('click', () => {
+            if (sidebar.classList.contains('sidebar-closed-left')) {
+                sidebar.classList.remove('sidebar-closed-left');
+                sidebar.classList.add('sidebar-open');
+                icon.textContent = 'close';
+            } else {
+                sidebar.classList.remove('sidebar-open');
+                sidebar.classList.add('sidebar-closed-left');
+                icon.textContent = 'menu_open';
+            }
+        });
+
+        // History Sidebar Logic (Right)
+        const historySidebar = document.getElementById('history-sidebar');
+        const navHistory = document.getElementById('nav-history');
+        const closeHistory = document.getElementById('close-history');
+
+        function toggleHistory() {
+            if (historySidebar.classList.contains('sidebar-closed-right')) {
+                historySidebar.classList.remove('sidebar-closed-right');
+                historySidebar.classList.add('sidebar-open');
+            } else {
+                historySidebar.classList.remove('sidebar-open');
+                historySidebar.classList.add('sidebar-closed-right');
+            }
+        }
+
+        navHistory.addEventListener('click', toggleHistory);
+        closeHistory.addEventListener('click', () => {
+            historySidebar.classList.remove('sidebar-open');
+            historySidebar.classList.add('sidebar-closed-right');
+        });
+
+        // Input Logic
+        const topicInput = document.getElementById('topic-input');
+        const topicCountDisplay = document.getElementById('topic-count');
+        let topicsList = [];
+
+        topicInput.addEventListener('input', () => {
+            topicsList = topicInput.value.split('\n').filter(t => t.trim() !== '');
+            topicCountDisplay.textContent = topicsList.length;
+        });
+
+        // Default topics if empty
+        const defaultTopics = [
+            "Neural Network Architecture", "Zero-Point Energy", "Cybernetic Enhancements", 
+            "Deep Space Anomaly", "Holographic Interfaces", "Quantum Entanglement",
+            "Synthesizer Sound Design", "Post-Scarcity Economics"
+        ];
+
+        // History Logic
+        const historyListEl = document.getElementById('history-list');
+        let generatedHistory = [];
+
+        function addToHistory(topic) {
+            if (generatedHistory.length === 0) {
+                historyListEl.innerHTML = ''; // clear empty state
+            }
+            generatedHistory.unshift(topic);
+            
+            const item = document.createElement('div');
+            item.className = 'p-sm bg-surface-container/50 rounded-xl border border-outline-variant/30 text-on-surface font-body-md text-body-md shadow-sm';
+            item.textContent = topic;
+            
+            historyListEl.prepend(item);
+        }
+
+        // Generator Logic
+        const generateBtn = document.getElementById('generate-btn');
+        const display = document.getElementById('topic-display');
+        let isAnimating = false;
+
+        generateBtn.addEventListener('click', () => {
+            if (isAnimating) return;
+            
+            const pool = topicsList.length > 0 ? topicsList : defaultTopics;
+            
+            isAnimating = true;
+            display.classList.remove('opacity-70');
+            display.classList.add('roulette-shimmer');
+            generateBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+            let duration = 2500; // 2.5 seconds
+            let interval = 50;
+            let elapsed = 0;
+
+            const roulette = setInterval(() => {
+                const randomTemp = pool[Math.floor(Math.random() * pool.length)];
+                display.textContent = randomTemp;
+                elapsed += interval;
+
+                if (elapsed >= duration) {
+                    clearInterval(roulette);
+                    const finalTopic = pool[Math.floor(Math.random() * pool.length)];
+                    display.textContent = finalTopic;
+                    display.classList.remove('roulette-shimmer');
+                    
+                    // Flash effect
+                    display.style.transform = 'scale(1.05)';
+                    display.style.color = '#9f402d'; // primary color
+                    
+                    addToHistory(finalTopic);
+                    
+                    setTimeout(() => {
+                        display.style.transform = 'scale(1)';
+                        display.style.color = ''; // reset to class color
+                        isAnimating = false;
+                        generateBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    }, 400);
+                }
+            }, interval);
+        });
+
+        // Simple Timer Logic
+        let timerInterval;
+        let timeLeft = 300; // 5 mins
+        let timerRunning = false;
+        const timerDisplay = document.getElementById('timer-display');
+        const timerStart = document.getElementById('timer-start');
+        const timerReset = document.getElementById('timer-reset');
+
+        function updateTimerDisplay() {
+            const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+            const s = (timeLeft % 60).toString().padStart(2, '0');
+            timerDisplay.textContent = `${m}:${s}`;
+        }
+
+        timerStart.addEventListener('click', () => {
+            if (!timerRunning) {
+                timerRunning = true;
+                timerStart.querySelector('span').textContent = 'pause';
+                timerInterval = setInterval(() => {
+                    if (timeLeft > 0) {
+                        timeLeft--;
+                        updateTimerDisplay();
+                    } else {
+                        clearInterval(timerInterval);
+                        timerRunning = false;
+                        timerStart.querySelector('span').textContent = 'play_arrow';
+                    }
+                }, 1000);
+            } else {
+                clearInterval(timerInterval);
+                timerRunning = false;
+                timerStart.querySelector('span').textContent = 'play_arrow';
+            }
+        });
+
+        timerReset.addEventListener('click', () => {
+            clearInterval(timerInterval);
+            timerRunning = false;
+            timeLeft = 300;
+            updateTimerDisplay();
+            timerStart.querySelector('span').textContent = 'play_arrow';
+        });
+    </script>
+</body></html>
