@@ -17,6 +17,7 @@ interface SidebarRightProps {
   history: HistoryItem[];
   onClearHistory: () => void;
   onSelectTopic: (topic: string, id: string) => void;
+  onDeleteHistoryItem: (id: string, e: React.MouseEvent) => void;
 }
 
 export default function SidebarRight({
@@ -25,6 +26,7 @@ export default function SidebarRight({
   history,
   onClearHistory,
   onSelectTopic,
+  onDeleteHistoryItem,
 }: SidebarRightProps) {
   const [playingId, setPlayingId] = useState<string | null>(null);
   const [playingUrl, setPlayingUrl] = useState<string | null>(null);
@@ -153,10 +155,6 @@ export default function SidebarRight({
     setPlayingId(null);
   };
 
-  const onAudioPlay = () => {
-    // Sync active play state
-  };
-
   return (
     <aside
       className={`fixed right-0 top-0 h-full w-[85vw] sm:w-[380px] md:w-[420px] glass-panel z-40 flex flex-col p-6 pt-32 shadow-2xl transition-transform duration-400 ${
@@ -189,7 +187,7 @@ export default function SidebarRight({
             <div
               key={item.id}
               onClick={() => onSelectTopic(item.topic, item.id)}
-              className="p-3.5 bg-surface-container/40 rounded-xl border border-outline-variant/20 text-on-surface text-sm font-medium shadow-sm hover:border-primary/40 hover:bg-primary/5 transition-all duration-300 cursor-pointer flex justify-between items-center group"
+              className="p-3.5 bg-surface-container/40 rounded-xl border border-outline-variant/20 text-on-surface text-sm font-medium shadow-sm hover:border-primary/40 hover:bg-primary/5 transition-all duration-300 cursor-pointer flex justify-between items-center group relative"
             >
               <div className="flex flex-col text-left flex-grow mr-2 overflow-hidden">
                 <span className="line-clamp-2 leading-relaxed">
@@ -245,6 +243,15 @@ export default function SidebarRight({
                 {item.hasRecording && !item.hasRecording && (
                   <Mic size={14} className="text-primary/60" />
                 )}
+
+                {/* Individual Trash Button */}
+                <button
+                  onClick={(e) => onDeleteHistoryItem(item.id, e)}
+                  className="p-1 hover:text-error transition-colors text-on-surface-variant/50 rounded-lg cursor-pointer bg-transparent border-none flex items-center justify-center active:scale-90"
+                  title="Eliminar del historial"
+                >
+                  <Trash2 size={13} />
+                </button>
 
                 <span className="text-[10px] uppercase font-bold text-primary/60 border border-primary/20 px-2 py-0.5 rounded-full opacity-60 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                   #{new Date(item.timestamp).getTime().toString().slice(-4)}

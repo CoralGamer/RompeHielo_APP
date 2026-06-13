@@ -9,7 +9,9 @@ import Timer from "@/components/Timer";
 import VoiceRecorder from "@/components/VoiceRecorder";
 import WelcomeModal from "@/components/WelcomeModal";
 import PrivacyModal from "@/components/PrivacyModal";
-import { clearAllRecordings } from "@/utils/db";
+import ConfirmModal from "@/components/ConfirmModal";
+import { clearAllRecordings, deleteRecording } from "@/utils/db";
+import { Star } from "lucide-react";
 
 interface HistoryItem {
   id: string;
@@ -26,6 +28,7 @@ export default function Home() {
   const [rightSidebarOpen, setRightSidebarOpen] = useState(false);
   const [welcomeModalOpen, setWelcomeModalOpen] = useState(false);
   const [privacyModalOpen, setPrivacyModalOpen] = useState(false);
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   
   const [topicsText, setTopicsText] = useState("");
   const [activeTopic, setActiveTopic] = useState("");
@@ -137,16 +140,38 @@ export default function Home() {
     setActiveTopic(topic);
   };
 
-  const handleClearHistory = async () => {
-    if (confirm("¿Estás seguro de que deseas borrar todo el historial y todas las grabaciones locales?")) {
-      setHistory([]);
+  const handleClearHistoryTrigger = () => {
+    setConfirmModalOpen(true);
+  };
+
+  const handleClearHistoryConfirm = async () => {
+    setHistory([]);
+    setActiveHistoryId(null);
+    setActiveTopic("");
+    try {
+      await clearAllRecordings();
+    } catch (e) {
+      console.error("Failed to clear local recording DB:", e);
+    }
+  };
+
+  const handleDeleteHistoryItem = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    // Remove from history state
+    setHistory((prev) => prev.filter((item) => item.id !== id));
+    
+    // If the active topic is the one being deleted, reset active states
+    if (activeHistoryId === id) {
       setActiveHistoryId(null);
       setActiveTopic("");
-      try {
-        await clearAllRecordings();
-      } catch (e) {
-        console.error("Failed to clear local recording DB:", e);
-      }
+    }
+
+    // Delete recording blob from DB
+    try {
+      await deleteRecording(id);
+    } catch (err) {
+      console.error("Failed to delete local recording blob:", err);
     }
   };
 
@@ -251,12 +276,13 @@ export default function Home() {
         isOpen={rightSidebarOpen}
         onClose={() => setRightSidebarOpen(false)}
         history={history}
-        onClearHistory={handleClearHistory}
+        onClearHistory={handleClearHistoryTrigger}
         onSelectTopic={handleSelectFromHistory}
+        onDeleteHistoryItem={handleDeleteHistoryItem}
       />
 
       {/* Main Canvas / Hero Area */}
-      <main className="relative z-10 flex-grow w-full flex flex-col items-center justify-center px-4 py-16 text-center max-w-4xl mx-auto overflow-hidden">
+      <main className="relative z-10 flex-1 w-full flex flex-col items-center justify-center px-4 py-16 text-center max-w-4xl mx-auto overflow-hidden">
         
         {/* Topic Selector */}
         <TopicSelector
@@ -289,6 +315,15 @@ export default function Home() {
       <PrivacyModal
         isOpen={privacyModalOpen}
         onClose={() => setPrivacyModalOpen(false)}
+      />
+
+      {/* Custom Confirmation Modal */}
+      <ConfirmModal
+        isOpen={confirmModalOpen}
+        onClose={() => setConfirmModalOpen(false)}
+        onConfirm={handleClearHistoryConfirm}
+        title="¿Borrar todo el historial?"
+        message="Esta acción eliminará de forma permanente todo tu historial de temas sorteados y todas las grabaciones de voz locales guardadas en este dispositivo. Esta acción no se puede deshacer."
       />
 
       {/* Footer */}
