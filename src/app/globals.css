@@ -1,26 +1,119 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fcf9f3;
+  --foreground: #1c1c18;
+  --primary: #9f402d;
+  --primary-hover: #b84e3a;
+  --primary-container: #e2725b;
+  --surface: #fcf9f3;
+  --surface-container: #f0eee8;
+  --surface-container-low: #f6f3ed;
+  --surface-container-high: #ebe8e2;
+  --outline-variant: rgba(221, 192, 186, 0.5);
+  --on-surface-variant: #56423e;
+  --on-tertiary-container: #4e1c00;
+  --glass-bg: rgba(252, 249, 243, 0.75);
+  --glass-border: rgba(221, 192, 186, 0.5);
+  --glass-shadow: rgba(86, 66, 62, 0.05);
+  --background-overlay: rgba(252, 249, 243, 0.5);
 }
 
-@theme inline {
+.dark {
+  --background: #08090f;
+  --foreground: #f1f2f8;
+  --primary: #c084fc;
+  --primary-hover: #a78bfa;
+  --primary-container: #a78bfa;
+  --surface: #10121d;
+  --surface-container: #171b2e;
+  --surface-container-low: #0c0e18;
+  --surface-container-high: #20253e;
+  --outline-variant: rgba(167, 139, 250, 0.2);
+  --on-surface-variant: #9da2c4;
+  --on-tertiary-container: #f1e7ff;
+  --glass-bg: rgba(16, 18, 29, 0.75);
+  --glass-border: rgba(167, 139, 250, 0.15);
+  --glass-shadow: rgba(0, 0, 0, 0.4);
+  --background-overlay: rgba(8, 9, 15, 0.65);
+}
+
+@theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-container: var(--primary-container);
+  --color-surface-container: var(--surface-container);
+  --color-surface-container-low: var(--surface-container-low);
+  --color-surface-container-high: var(--surface-container-high);
+  --color-outline-variant: var(--outline-variant);
+  --color-on-surface-variant: var(--on-surface-variant);
+  --color-on-tertiary-container: var(--on-tertiary-container);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* Custom Components & Utilities */
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 32px var(--glass-shadow);
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.input-focus-border {
+  border-bottom: 2px solid transparent;
+  transition: border-color 0.3s ease;
+}
+
+.input-focus-border:focus {
+  border-bottom-color: var(--primary);
+  outline: none;
+}
+
+.roulette-shimmer {
+  animation: shimmer 0.1s infinite;
+}
+
+@keyframes shimmer {
+  0% { opacity: 0.8; transform: translateY(-2px); }
+  50% { opacity: 1; transform: translateY(2px); }
+  100% { opacity: 0.8; transform: translateY(-2px); }
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--outline-variant);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+
+/* Hide scrollbars for aside when not hovering */
+aside::-webkit-scrollbar {
+  width: 4px;
+}
+
+aside {
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
